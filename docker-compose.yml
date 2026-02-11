@@ -1,0 +1,27 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # 1. The PHP App (The Brain)
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: effiduase-app
+    restart: always
+    working_dir: /var/www
+    volumes:
+      - ./backend:/var/www
+
+  # 2. The Web Server (The Mouth)
+  nginx:
+    image: nginx:alpine
+    container_name: effiduase-nginx
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./backend:/var/www
+      - ./nginx-conf:/etc/nginx/conf.d
+    depends_on:
+      - app
