@@ -1,32 +1,38 @@
-# docker-compose.yml
 version: '3.8'
 
 services:
-  # 1. The PHP App (The Brain)
-  app:
+  # 1. THE BRAIN (PHP API)
+  api:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: effiduase-app
-    restart: always
-    working_dir: /var/www
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-    env_file:
-      - .env
-    volumes:
-      - ./backend:/var/www
-
-  # 2. The Web Server (The Mouth)
-  nginx:
-    image: nginx:alpine
-    container_name: effiduase-nginx
-    restart: always
+    container_name: church-api
     ports:
-      - "8080:80"
+      - "8000:80"
     volumes:
-      - ./backend:/var/www
-      - ./nginx-conf:/etc/nginx/conf.d
+      - ./backend:/var/www/html
+    working_dir: /var/www/html/public
+    networks:
+      - app-network
+
+  # 2. THE FACE (React Frontend)
+  client:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: church-client
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
     depends_on:
-      - app
+      - api
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
