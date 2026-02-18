@@ -2,13 +2,19 @@
 class Database {
     public $conn;
 
-    public function getConnection() {
+public function getConnection() {
         $this->conn = null;
 
         try {
-            // SQLite Connection: It just looks for a file!
-            $this->conn = new PDO("sqlite:/var/www/database.sqlite");
+            $dbPath = __DIR__ . '/../database.sqlite';
             
+            // Check if file exists (Debug helper)
+            if (!file_exists($dbPath)) {
+                // Attempt to create it if missing (permissions allowing)
+                touch($dbPath);
+            }
+
+            $this->conn = new PDO("sqlite:" . $dbPath);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
         } catch(PDOException $exception) {
@@ -18,4 +24,4 @@ class Database {
         return $this->conn;
     }
 }
-?>
+?> 
