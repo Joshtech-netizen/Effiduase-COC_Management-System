@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Members from './pages/Members';
+import Finance from './pages/Finance';
 import type { JSX } from 'react/jsx-dev-runtime';
 
 // A simple component to protect routes
@@ -33,6 +34,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Members />
+            </ProtectedRoute>
+          } 
+        />
+        {/* Route 4: Finance Page (Protected) */}
+        <Route 
+          path="/finance" 
+          element={
+            <ProtectedRoute>
+              <Finance />
             </ProtectedRoute>
           } 
         />
