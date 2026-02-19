@@ -25,6 +25,15 @@ public function getConnection() {
                 status TEXT DEFAULT 'active',
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )");
+
+            $this->conn->exec("CREATE TABLE IF NOT EXISTS finances (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                type TEXT NOT NULL, -- e.g., Tithe, Offering, Donation
+                amount REAL NOT NULL,
+                description TEXT,
+                transaction_date DATE NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )");
             
         } catch(PDOException $exception) {
             echo "Connection error: " . $exception->getMessage();
