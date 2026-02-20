@@ -3,6 +3,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Members from './pages/Members';
 import Finance from './pages/Finance';
+import Welfare from './pages/Welfare';
 import type { JSX } from 'react/jsx-dev-runtime';
 
 // A simple component to protect routes
@@ -43,6 +44,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Finance />
+            </ProtectedRoute>
+          } 
+        />
+        {/* Route 5: Welfare Page (Protected) */}
+        <Route 
+          path="/welfare" 
+          element={
+            <ProtectedRoute>
+              <Welfare />
             </ProtectedRoute>
           } 
         />
