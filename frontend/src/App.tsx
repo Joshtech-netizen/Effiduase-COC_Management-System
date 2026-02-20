@@ -1,9 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard/Dashboard';
 import Members from './pages/Members';
 import Finance from './pages/Finance';
 import Welfare from './pages/Welfare';
+import Children from './pages/Children';
 import type { JSX } from 'react/jsx-dev-runtime';
 
 // A simple component to protect routes
@@ -53,6 +54,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Welfare />
+            </ProtectedRoute>
+          } 
+        />
+        {/* Route 6: Children Page (Protected) */}
+        <Route 
+          path="/children" 
+          element={
+            <ProtectedRoute>
+              <Children />
             </ProtectedRoute>
           } 
         />
