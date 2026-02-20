@@ -1,10 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
+import Login from './pages/Login/Login';
 import Dashboard from './pages/Dashboard/Dashboard';
-import Members from './pages/Members';
-import Finance from './pages/Finance';
-import Welfare from './pages/Welfare';
-import Children from './pages/Children';
+import Members from './pages/Members/Members';
+import Finance from './pages/Finance/Finance';
+import Welfare from './pages/Welfare/Welfare';
+import Children from './pages/Children/Children';
 import type { JSX } from 'react/jsx-dev-runtime';
 
 // A simple component to protect routes
