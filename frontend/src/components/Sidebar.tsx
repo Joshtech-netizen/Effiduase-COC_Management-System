@@ -32,6 +32,12 @@ const Sidebar: React.FC = () => {
                 >
                     Finance
                 </Link>
+                <Link 
+                    to="/welfare" 
+                    className={`sidebar-link ${location.pathname === '/welfare' ? 'active' : ''}`}
+                >
+                    Welfare
+                </Link>
             </div>
         </nav>
     );
