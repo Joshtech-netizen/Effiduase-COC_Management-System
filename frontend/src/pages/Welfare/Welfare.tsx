@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
 import Sidebar from '../../components/Sidebar';
 import './Welfare.css';
 
@@ -23,7 +26,6 @@ interface WelfareRecord {
 const Welfare: React.FC = () => {
     const [records, setRecords] = useState<WelfareRecord[]>([]);
     const [members, setMembers] = useState<Member[]>([]);
-    const [loading, setLoading] = useState(true);
     
     const today = new Date().toISOString().split('T')[0];
 
@@ -57,13 +59,13 @@ const Welfare: React.FC = () => {
             }
         } catch (error) {
             console.error("Error fetching data:", error);
-        } finally {
-            setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchData();
+        (async () => {
+            await fetchData();
+        })();
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -101,6 +103,59 @@ const Welfare: React.FC = () => {
                 alert("Failed to delete record.");
             }
         }
+    };
+
+    // --- EXPORT TO PDF ---
+    const exportToPDF = () => {
+        const doc = new jsPDF();
+        
+        // Add a Title
+        doc.setFontSize(18);
+        doc.text("Welfare Report - Effiduase Church of Christ", 14, 20);
+        doc.setFontSize(11);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 28);
+
+        // Prepare Table Data
+        const tableColumns = ["Date", "Member", "Transaction Type", "Description", "Amount (GHS)"];
+        const tableRows = records.map(record => [
+            new Date(record.transaction_date).toLocaleDateString(),
+            `${record.first_name} ${record.last_name}`,
+            record.transaction_type,
+            record.description || '-',
+            Number(record.amount).toFixed(2)
+        ]);
+
+        // Draw the Table
+        autoTable(doc, {
+            head: [tableColumns],
+            body: tableRows,
+            startY: 35,
+            theme: 'striped',
+            headStyles: { fillColor: [13, 110, 253] } // Primary blue header
+        });
+
+        // Save the file
+        doc.save("Welfare_Report.pdf");
+    };
+
+    // --- EXPORT TO EXCEL ---
+    const exportToExcel = () => {
+        // Format the data perfectly for Excel rows
+        const excelData = records.map(record => ({
+            "Date": new Date(record.transaction_date).toLocaleDateString(),
+            "Member": `${record.first_name} ${record.last_name}`,
+            "Transaction Type": record.transaction_type,
+            "Description": record.description || '-',
+            "Amount (GHS)": Number(record.amount)
+        }));
+
+        // Create the spreadsheet
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Welfare");
+        
+        // Save the file
+        XLSX.writeFile(workbook, "Welfare_Report.xlsx");
     };
 
     // Calculate Total Welfare Fund Balance (Dues - Payouts)
@@ -181,50 +236,54 @@ const Welfare: React.FC = () => {
                         <div className="card shadow-sm border-0">
                             <div className="card-body">
                                 <h5 className="card-title mb-3">Welfare Ledger</h5>
-                                {loading ? (
-                                    <p>Loading records...</p>
-                                ) : (
-                                    <div className="table-responsive">
-                                        <table className="table table-hover align-middle">
-                                            <thead className="table-light">
-                                                <tr>
-                                                    <th>Date</th>
-                                                    <th>Member</th>
-                                                    <th>Type</th>
-                                                    <th>Description</th>
-                                                    <th>Amount</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {records.length === 0 ? (
-                                                    <tr><td colSpan={6} className="text-center text-muted py-4">No welfare records found.</td></tr>
-                                                ) : (
-                                                    records.map(record => (
-                                                        <tr key={record.id}>
-                                                            <td>{new Date(record.transaction_date).toLocaleDateString()}</td>
-                                                            <td className="fw-bold">{record.first_name} {record.last_name}</td>
-                                                            <td>
-                                                                <span className={`badge ${record.transaction_type === 'Due' ? 'bg-success' : 'bg-warning text-dark'}`}>
-                                                                    {record.transaction_type}
-                                                                </span>
-                                                            </td>
-                                                            <td className="text-muted">{record.description}</td>
-                                                            <td className={`fw-bold ${record.transaction_type === 'Due' ? 'text-success' : 'text-danger'}`}>
-                                                                {record.transaction_type === 'Due' ? '+' : '-'} ₵{Number(record.amount).toFixed(2)}
-                                                            </td>
-                                                            <td>
-                                                                <button onClick={() => handleDelete(record.id)} className="btn btn-sm btn-outline-danger">
-                                                                    Del
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
+                                <div className="mb-3">
+                                    <button onClick={exportToExcel} className="btn btn-sm btn-outline-success me-2 fw-bold">
+                                        📊 Export Excel
+                                    </button>
+                                    <button onClick={exportToPDF} className="btn btn-sm btn-outline-danger fw-bold">
+                                        📄 Export PDF
+                                    </button>
+                                </div>
+                                <div className="table-responsive">
+                                    <table className="table table-hover align-middle">
+                                        <thead className="table-light">
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Member</th>
+                                                <th>Type</th>
+                                                <th>Description</th>
+                                                <th>Amount</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {records.length === 0 ? (
+                                                <tr><td colSpan={6} className="text-center text-muted py-4">No welfare records found.</td></tr>
+                                            ) : (
+                                                records.map(record => (
+                                                    <tr key={record.id}>
+                                                        <td>{new Date(record.transaction_date).toLocaleDateString()}</td>
+                                                        <td className="fw-bold">{record.first_name} {record.last_name}</td>
+                                                        <td>
+                                                            <span className={`badge ${record.transaction_type === 'Due' ? 'bg-success' : 'bg-warning text-dark'}`}>
+                                                                {record.transaction_type}
+                                                            </span>
+                                                        </td>
+                                                        <td className="text-muted">{record.description}</td>
+                                                        <td className={`fw-bold ${record.transaction_type === 'Due' ? 'text-success' : 'text-danger'}`}>
+                                                            {record.transaction_type === 'Due' ? '+' : '-'} ₵{Number(record.amount).toFixed(2)}
+                                                        </td>
+                                                        <td>
+                                                            <button onClick={() => handleDelete(record.id)} className="btn btn-sm btn-outline-danger">
+                                                                Del
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
