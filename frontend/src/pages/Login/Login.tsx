@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import './Login.css';
 
 interface LoginResponse {
     message: string;
@@ -27,7 +27,7 @@ const Login: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-const handleLogin = async (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
@@ -46,6 +46,7 @@ const handleLogin = async (e: React.FormEvent) => {
                 localStorage.setItem('user_token', response.data.token);
                 localStorage.setItem('user_role', response.data.user.role);
                 localStorage.setItem('user_name', response.data.user.name);
+                
                 // Go to Dashboard
                 navigate('/dashboard');
             } else {
@@ -66,38 +67,42 @@ const handleLogin = async (e: React.FormEvent) => {
     };
 
     return (
-        <div className="d-flex align-items-center justify-content-center vh-100 bg-light">
-            <div className="card shadow p-4" style={{ width: '400px' }}>
-                <h3 className="text-center mb-4">Church Admin</h3>
+        <div className="login-wrapper">
+            <div className="login-card">
+                <h3 className="text-center login-title">Church Admin</h3>
                 
-                {error && <div className="alert alert-danger">{error}</div>}
+                {error && <div className="alert alert-danger p-2 small text-center">{error}</div>}
                 
                 <form onSubmit={handleLogin}>
                     <div className="mb-3">
-                        <label className="form-label">Email Address</label>
-                        <input 
-                            type="email" 
-                            className="form-control" 
+                        <label className="login-label">Email Address</label>
+                        <input
+                            type="email"
+                            className="form-control login-input"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required 
+                            onChange={(event) => setEmail(event.target.value)}
+                            required
                             placeholder="admin@church.com"
                         />
                     </div>
-                    
+
                     <div className="mb-3">
-                        <label className="form-label">Password</label>
-                        <input 
-                            type="password" 
-                            className="form-control" 
+                        <label className="login-label">Password</label>
+                        <input
+                            type="password"
+                            className="form-control login-input"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required 
+                            onChange={(event) => setPassword(event.target.value)}
+                            required
                             placeholder="Enter password"
                         />
                     </div>
 
-                    <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+                    <button
+                        type="submit"
+                        className="btn btn-primary w-100 login-btn"
+                        disabled={loading}
+                    >
                         {loading ? 'Signing in...' : 'Sign In'}
                     </button>
                 </form>
