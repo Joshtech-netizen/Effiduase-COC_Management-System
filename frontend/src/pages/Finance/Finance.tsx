@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
 import Sidebar from '../../components/Sidebar';
 import './Finance.css';
 
@@ -14,7 +17,6 @@ interface FinanceRecord {
 
 const Finance: React.FC = () => {
     const [records, setRecords] = useState<FinanceRecord[]>([]);
-    const [loading, setLoading] = useState(true);
     
     // Get today's date in YYYY-MM-DD format for the default input
     const today = new Date().toISOString().split('T')[0];
@@ -35,13 +37,22 @@ const Finance: React.FC = () => {
             }
         } catch (error) {
             console.error("Error fetching finances:", error);
-        } finally {
-            setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchFinances();
+        const loadFinances = async () => {
+            try {
+                const response = await axios.get(API_URL);
+                if (response.data.status === 'success') {
+                    setRecords(response.data.data);
+                }
+            } catch (error) {
+                console.error("Error fetching finances:", error);
+            }
+        };
+        
+        loadFinances();
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -80,6 +91,57 @@ const Finance: React.FC = () => {
                 alert("Failed to delete record.");
             }
         }
+    };
+
+    // --- EXPORT TO PDF ---
+    const exportToPDF = () => {
+        const doc = new jsPDF();
+        
+        // Add a Title
+        doc.setFontSize(18);
+        doc.text("Financial Report - Effiduase Church of Christ", 14, 20);
+        doc.setFontSize(11);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 28);
+
+        // Prepare Table Data
+        const tableColumns = ["Date", "Type", "Description", "Amount (GHS)"];
+        const tableRows = records.map(record => [
+            new Date(record.transaction_date).toLocaleDateString(),
+            record.type,
+            record.description || '-',
+            Number(record.amount).toFixed(2)
+        ]);
+
+        // Draw the Table
+        autoTable(doc, {
+            head: [tableColumns],
+            body: tableRows,
+            startY: 35,
+            theme: 'striped',
+            headStyles: { fillColor: [13, 110, 253] } // Primary blue header
+        });
+
+        // Save the file
+        doc.save("Church_Financial_Report.pdf");
+    };
+
+    // --- EXPORT TO EXCEL ---
+    const exportToExcel = () => {
+        // Format the data perfectly for Excel rows
+        const excelData = records.map(record => ({
+            "Date": new Date(record.transaction_date).toLocaleDateString(),
+            "Transaction Type": record.type,
+            "Description": record.description || '-',
+            "Amount (GHS)": Number(record.amount)
+        }));
+
+        // Create the spreadsheet
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Finances");
+        
+        // Save the file
+        XLSX.writeFile(workbook, "Church_Financial_Report.xlsx");
     };
 
     // Calculate Total
@@ -145,47 +207,56 @@ const Finance: React.FC = () => {
                     <div className="col-md-8">
                         <div className="card shadow-sm border-0">
                             <div className="card-body">
-                                <h5 className="card-title mb-3">Transaction History</h5>
-                                {loading ? (
-                                    <p>Loading records...</p>
-                                ) : (
-                                    <div className="table-responsive">
-                                        <table className="table table-hover align-middle">
-                                            <thead className="table-light">
-                                                <tr>
-                                                    <th>Date</th>
-                                                    <th>Type</th>
-                                                    <th>Description</th>
-                                                    <th>Amount</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {records.length === 0 ? (
-                                                    <tr><td colSpan={5} className="text-center text-muted py-4">No records found.</td></tr>
-                                                ) : (
-                                                    records.map(record => (
-                                                        <tr key={record.id}>
-                                                            <td>{new Date(record.transaction_date).toLocaleDateString()}</td>
-                                                            <td>
-                                                                <span className={`badge ${record.type === 'Tithe' ? 'bg-primary' : 'bg-secondary'}`}>
-                                                                    {record.type}
-                                                                </span>
-                                                            </td>
-                                                            <td className="text-muted">{record.description || '-'}</td>
-                                                            <td className="fw-bold text-success">₵ {Number(record.amount).toFixed(2)}</td>
-                                                            <td>
-                                                                <button onClick={() => handleDelete(record.id)} className="btn btn-sm btn-outline-danger">
-                                                                    Delete
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                )}
-                                            </tbody>
-                                        </table>
+                              <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 className="card-title mb-0 fw-bold">Transaction History</h5>
+                                    <div>
+                                        <button onClick={exportToExcel} className="btn btn-sm btn-outline-success me-2 fw-bold">
+                                            📊 Export Excel
+                                        </button>
+                                        <button onClick={exportToPDF} className="btn btn-sm btn-outline-danger fw-bold">
+                                            📄 Export PDF
+                                        </button>
                                     </div>
-                                )}
+                                </div>
+                                <div className="table-responsive">
+                                    <table className="table table-hover mb-0">
+                                        <thead className="table-light">
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Type</th>
+                                                <th>Description</th>
+                                                <th>Amount (GHS)</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {records.length > 0 ? (
+                                                records.map(record => (
+                                                    <tr key={record.id}>
+                                                        <td>{new Date(record.transaction_date).toLocaleDateString()}</td>
+                                                        <td><span className="badge bg-info">{record.type}</span></td>
+                                                        <td>{record.description || '-'}</td>
+                                                        <td className="fw-bold">₵ {Number(record.amount).toFixed(2)}</td>
+                                                        <td>
+                                                            <button 
+                                                                onClick={() => handleDelete(record.id)} 
+                                                                className="btn btn-sm btn-outline-danger"
+                                                            >
+                                                                🗑️ Delete
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan={5} className="text-center text-muted py-4">
+                                                        No records found. Add a new record to get started.
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
