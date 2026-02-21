@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Sidebar from '../../components/Sidebar';
+import './Children.css';
 
 interface Member {
     id: number;
@@ -107,10 +108,10 @@ const Children: React.FC = () => {
     };
 
     return (
-        <div className="d-flex" style={{ height: '100vh', overflow: 'hidden' }}>
+        <div className="d-flex paper-wrapper">
             <Sidebar />
 
-            <div className="flex-grow-1 bg-light p-4" style={{ overflowY: 'auto' }}>
+            <div className="flex-grow-1 bg-light p-4 content-wrapper">
                 <header className="mb-4 d-flex justify-content-between align-items-center">
                     <div>
                         <h2>Children's Ministry</h2>
