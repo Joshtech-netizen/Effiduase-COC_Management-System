@@ -52,6 +52,13 @@ const Sidebar: React.FC = () => {
                         Children's Ministry
                     </Link>
                 )}
+
+                {/* User Accounts (ONLY for Pastor) */}
+                {isPastor && (
+                    <Link to="/users" className={`sidebar-link ${location.pathname === '/users' ? 'active' : ''}`}>
+                        ⚙️ Manage Accounts
+                    </Link>
+                )}
             </div>
         </nav>
     );
