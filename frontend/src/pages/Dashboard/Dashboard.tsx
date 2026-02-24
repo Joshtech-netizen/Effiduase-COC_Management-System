@@ -88,7 +88,7 @@ const Dashboard: React.FC = () => {
             <div className="flex-grow-1 bg-light p-4 content-wrapper">
                 <header className="d-flex justify-content-between align-items-center mb-5">
                     <div>
-                        <h2 className="mb-0 fw-bold">Church Admin Dashboard</h2>
+                        <h2 className="mb-0 fw-bold text-capitalize">{userRole === 'pastor' ? 'Pastor' : userRole} Dashboard</h2>
                         <p className="text-muted">Welcome back. Here is the real-time overview for Effiduase Church of Christ.</p>
                     </div>
                     <button onClick={handleLogout} className="btn btn-outline-danger shadow-sm fw-bold">
