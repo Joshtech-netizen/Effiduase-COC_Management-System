@@ -65,33 +65,33 @@ const Dashboard: React.FC = () => {
                         <div className="row g-4 mb-5">
                             <div className="col-md-3">
                                 <div className="card shadow border-0 h-100 bg-primary text-white stat-card">
-                                    <div className="card-body py-4">
+                                    <div className="card-body py-3">
                                         <h6 className="card-title text-uppercase mb-2 opacity-75 fw-bold">Total Members</h6>
-                                        <h2 className="display-6 fw-bold mb-0">{totalMembers}</h2>
+                                        <h2 className="fw-bold mb-0">{totalMembers}</h2>
                                     </div>
                                 </div>
                             </div>
                             <div className="col-md-3">
                                 <div className="card shadow border-0 h-100 bg-success text-white stat-card">
-                                    <div className="card-body py-4">
+                                    <div className="card-body py-3">
                                         <h6 className="card-title text-uppercase mb-2 opacity-75 fw-bold">Total Income</h6>
-                                        <h2 className="display-6 fw-bold mb-0">₵ {totalFinances.toFixed(2)}</h2>
+                                        <h2 className="fw-bold mb-0">₵ {totalFinances.toFixed(2)}</h2>
                                     </div>
                                 </div>
                             </div>
                             <div className="col-md-3">
                                 <div className="card shadow border-0 h-100 bg-info text-white stat-card">
-                                    <div className="card-body py-4">
+                                    <div className="card-body py-3">
                                         <h6 className="card-title text-uppercase mb-2 opacity-75 fw-bold">Welfare Fund</h6>
-                                        <h2 className="display-6 fw-bold mb-0">₵ {welfareBalance.toFixed(2)}</h2>
+                                        <h2 className="fw-bold mb-0">₵ {welfareBalance.toFixed(2)}</h2>
                                     </div>
                                 </div>
                             </div>
                             <div className="col-md-3">
                                 <div className="card shadow border-0 h-100 bg-warning text-dark stat-card">
-                                    <div className="card-body py-4">
+                                    <div className="card-body py-3">
                                         <h6 className="card-title text-uppercase mb-2 opacity-75 fw-bold">Total Children</h6>
-                                        <h2 className="display-6 fw-bold mb-0">{totalChildren}</h2>
+                                        <h2 className="fw-bold mb-0">{totalChildren}</h2>
                                     </div>
                                 </div>
                             </div>
@@ -99,7 +99,7 @@ const Dashboard: React.FC = () => {
                         <div className="row">
                             <div className="col-12">
                                 <div className="card shadow-sm border-0">
-                                    <div className="card-body p-4">
+                                    <div className="card-body p-3">
                                         <h5 className="mb-4 fw-bold text-muted">Quick Actions</h5>
                                         <div className="d-flex gap-3 flex-wrap">
                                             <Link to="/members" className="btn btn-outline-primary px-4 py-2">➕ Add Member</Link>
