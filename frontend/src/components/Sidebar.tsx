@@ -16,9 +16,9 @@ const Sidebar: React.FC = () => {
 
     return (
         <nav className="custom-sidebar shadow-lg">
-            <div className="sidebar-brand">
-                Church Admin
-                <div className="sidebar-role-badge badge bg-secondary mt-2 d-block text-uppercase">
+            <div className="sidebar-brand text-uppercase">
+                {userRole === 'pastor' ? 'PASTOR ADMIN' : `${userRole} ADMIN`}
+                <div className="badge bg-secondary mt-2 d-block text-uppercase badge-role-text">
                     Role: {userRole}
                 </div>
             </div>
