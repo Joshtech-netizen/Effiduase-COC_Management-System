@@ -1,13 +1,13 @@
 <?php
 class Database {
-    public $conn;
-
+    private $conn;
 public function getConnection() {
         $this->conn = null;
 
         try {
             $dbPath = __DIR__ . '/../database.sqlite';
             
+            // Create the file if it got deleted
             if (!file_exists($dbPath)) {
                 touch($dbPath);
             }
@@ -15,7 +15,7 @@ public function getConnection() {
             $this->conn = new PDO("sqlite:" . $dbPath);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            // 🔥 THE BULLDOZER: Force create the table every time it connects
+            // 1. Members Table (Now with 'photo' column included!)
             $this->conn->exec("CREATE TABLE IF NOT EXISTS members (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 first_name TEXT NOT NULL,
@@ -23,23 +23,25 @@ public function getConnection() {
                 phone TEXT,
                 gender TEXT,
                 status TEXT DEFAULT 'active',
+                photo TEXT, 
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )");
 
+            // 2. Finances Table
             $this->conn->exec("CREATE TABLE IF NOT EXISTS finances (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                type TEXT NOT NULL, -- e.g., Tithe, Offering, Donation
+                type TEXT NOT NULL,
                 amount REAL NOT NULL,
                 description TEXT,
                 transaction_date DATE NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )");
-            
-            //  Welfare Table
+
+            // 3. Welfare Table
             $this->conn->exec("CREATE TABLE IF NOT EXISTS welfare (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 member_id INTEGER,
-                transaction_type TEXT NOT NULL, -- 'Due' (Income) or 'Payout' (Expense)
+                transaction_type TEXT NOT NULL,
                 amount REAL NOT NULL,
                 description TEXT,
                 transaction_date DATE NOT NULL,
@@ -47,7 +49,7 @@ public function getConnection() {
                 FOREIGN KEY (member_id) REFERENCES members(id)
             )");
 
-            // Children Table (Prepping for next step)
+            // 4. Children Table
             $this->conn->exec("CREATE TABLE IF NOT EXISTS children (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 first_name TEXT NOT NULL,
@@ -58,6 +60,14 @@ public function getConnection() {
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (parent_id) REFERENCES members(id)
             )");
+
+            // Safety check: If the table survived but doesn't have the photo column, add it quietly
+            try {
+                $this->conn->exec("ALTER TABLE members ADD COLUMN photo TEXT");
+            } catch(PDOException $e) {
+                // Column already exists, do nothing
+            }
+            
         } catch(PDOException $exception) {
             echo "Connection error: " . $exception->getMessage();
         }
@@ -65,4 +75,4 @@ public function getConnection() {
         return $this->conn;
     }
 }
-?> 
+?>
