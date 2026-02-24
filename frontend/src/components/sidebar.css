@@ -45,3 +45,7 @@
     background-color: #00476C; /* Primary blue */
     box-shadow: 0 4px 6px rgba(0, 71, 108, 0.2);
 }
+
+.sidebar-role-badge {
+    font-size: 0.7rem;
+}
