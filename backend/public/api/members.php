@@ -36,8 +36,8 @@ try {
             exit();
         }
         
-        $query = "INSERT INTO members (first_name, last_name, phone, gender, status) 
-                  VALUES (:first_name, :last_name, :phone, :gender, :status)";
+        $query = "INSERT INTO members (first_name, last_name, phone, gender, status, photo) 
+                  VALUES (:first_name, :last_name, :phone, :gender, :status, :photo)";
         $stmt = $db->prepare($query);
         
         $stmt->execute([
@@ -45,7 +45,8 @@ try {
             ':last_name' => htmlspecialchars(strip_tags($data->last_name)),
             ':phone' => $data->phone ?? null,
             ':gender' => $data->gender ?? 'Male',
-            ':status' => $data->status ?? 'active'
+            ':status' => $data->status ?? 'active',
+            ':photo' => $data->photo ?? null
         ]);
         
         echo json_encode(["message" => "Member added successfully."]);
@@ -63,7 +64,7 @@ try {
         }
         
         $query = "UPDATE members SET first_name = :first_name, last_name = :last_name, 
-                  phone = :phone, gender = :gender, status = :status WHERE id = :id";
+                  phone = :phone, gender = :gender, status = :status, photo = :photo WHERE id = :id";
         $stmt = $db->prepare($query);
         
         $stmt->execute([
@@ -72,7 +73,8 @@ try {
             ':last_name' => htmlspecialchars(strip_tags($data->last_name)),
             ':phone' => $data->phone ?? null,
             ':gender' => $data->gender ?? 'Male',
-            ':status' => $data->status ?? 'active'
+            ':status' => $data->status ?? 'active',
+            ':photo' => $data->photo ?? null
         ]);
         
         echo json_encode(["message" => "Member updated successfully."]);
@@ -97,6 +99,11 @@ try {
         exit();
     }
 
+    // Add the photo column if it doesn't exist
+            try {
+                $db->exec("ALTER TABLE members ADD COLUMN photo TEXT");
+            } catch(PDOException $e) {
+          }
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(["message" => "Database error: " . $e->getMessage()]);
