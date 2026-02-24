@@ -5,6 +5,7 @@ import Members from './pages/Members/Members';
 import Finance from './pages/Finance/Finance';
 import Welfare from './pages/Welfare/Welfare';
 import Children from './pages/Children/Children';
+import Users from './pages/Users/Users';
 import type { JSX } from 'react/jsx-dev-runtime';
 
 // A simple component to protect routes
@@ -63,6 +64,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Children />
+            </ProtectedRoute>
+          } 
+        />
+        {/* Route 7: Users Page (Protected) */}
+        <Route 
+          path="/users" 
+          element={
+            <ProtectedRoute>
+              <Users />
             </ProtectedRoute>
           } 
         />
