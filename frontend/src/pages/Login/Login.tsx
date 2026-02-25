@@ -46,6 +46,7 @@ const Login: React.FC = () => {
                 localStorage.setItem('user_token', response.data.token);
                 localStorage.setItem('user_role', response.data.user.role);
                 localStorage.setItem('user_name', response.data.user.name);
+                localStorage.setItem('user_id', response.data.user.id.toString());
                 
                 // Go to Dashboard
                 navigate('/dashboard');
