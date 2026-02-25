@@ -6,6 +6,7 @@ import Finance from './pages/Finance/Finance';
 import Welfare from './pages/Welfare/Welfare';
 import Children from './pages/Children/Children';
 import Users from './pages/Users/Users';
+import Profile from './pages/Profile';
 import type { JSX } from 'react/jsx-dev-runtime';
 
 // A simple component to protect routes
@@ -73,6 +74,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Users />
+            </ProtectedRoute>
+          } 
+        />
+        {/* Route 8: Profile Page (Protected) */}
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           } 
         />
