@@ -59,6 +59,11 @@ const Sidebar: React.FC = () => {
                         ⚙️ Manage Accounts
                     </Link>
                 )}
+
+                {/* My Profile (For EVERYONE) */}
+                <Link to="/profile" className={`sidebar-link ${location.pathname === '/profile' ? 'active' : ''}`}>
+                    👤 My Profile
+                </Link>
             </div>
         </nav>
     );
