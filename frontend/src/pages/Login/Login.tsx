@@ -4,13 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
 interface LoginResponse {
+    status: string;
     message: string;
-    user: {
-        id: number;
-        name: string;
-        role: string;
+    data: {
+        user: {
+            id: number;
+            name: string;
+            role: string;
+        };
+        token: string;
     };
-    token: string;
 }
 
 interface ErrorResponse {
@@ -39,14 +42,17 @@ const Login: React.FC = () => {
             });
 
             // If the backend sent the user object, login is successful!
-            if (response.data && response.data.user) {
-                console.log("Login Success:", response.data);
+            if (response.data.status === 'success' && response.data.data.user) {
+            const userData = response.data.data.user;
+            const token = response.data.data.token;
+
+            console.log("Login Success:", response.data.data);
                 
                 // Save credentials
-                localStorage.setItem('user_token', response.data.token);
-                localStorage.setItem('user_role', response.data.user.role);
-                localStorage.setItem('user_name', response.data.user.name);
-                localStorage.setItem('user_id', response.data.user.id.toString());
+                localStorage.setItem('user_token', token);
+                localStorage.setItem('user_role', userData.role);
+                localStorage.setItem('user_name', userData.name);
+                localStorage.setItem('user_id', userData.id.toString());
                 
                 // Go to Dashboard
                 navigate('/dashboard');
