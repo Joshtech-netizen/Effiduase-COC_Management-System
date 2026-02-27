@@ -30,9 +30,26 @@ services:
       - VITE_API_URL=http://localhost:8000
     depends_on:
       - api
+
+  db:
+    image: mysql:8.0
+    container_name: church_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: church_system
+      MYSQL_ROOT_PASSWORD: root_password_123
+      MYSQL_USER: church_admin
+      MYSQL_PASSWORD: church_password_123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
     networks:
       - app-network
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  mysql_data: 
