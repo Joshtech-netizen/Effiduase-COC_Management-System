@@ -15,38 +15,42 @@ const Profile: React.FC = () => {
     const userId = localStorage.getItem('user_id');
 
     const handlePasswordChange = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setMessage('');
-        setError('');
+    e.preventDefault();
+    setMessage('');
+    setError('');
 
-        if (newPassword !== confirmPassword) {
-            setError("New passwords do not match!");
-            return;
+    if (newPassword !== confirmPassword) {
+        setError("New passwords do not match!");
+        return;
+    }
+
+    if (!userId) {
+        setError("Session error. Please log out and log back in.");
+        return;
+    }
+
+    try {
+       
+        const response = await axios.put('http://127.0.0.1:8000/api/users.php', {
+            user_id: userId,
+            current_password: currentPassword,
+            new_password: newPassword,
+            action: 'change_password' 
+        });
+
+        if (response.data.status === 'success') {
+            setMessage("Password updated successfully!");
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
         }
-
-        if (!userId) {
-            setError("Session error. Please log out and log back in.");
-            return;
-        }
-
-        try {
-            const response = await axios.post('http://127.0.0.1:8000/api/change_password.php', {
-                user_id: userId,
-                current_password: currentPassword,
-                new_password: newPassword
-            });
-
-            if (response.data.status === 'success') {
-                setMessage("Password updated successfully!");
-                setCurrentPassword('');
-                setNewPassword('');
-                setConfirmPassword('');
-            }
-        } catch (err) {
-            const errorMessage = axios.isAxiosError(err) ? err.response?.data?.message : "Failed to update password.";
-            setError(errorMessage || "Failed to update password.");
-        }
-    };
+    } catch (err) {
+        const errorMessage = axios.isAxiosError(err) 
+            ? err.response?.data?.message 
+            : "Failed to update password.";
+        setError(errorMessage || "Failed to update password.");
+    }
+};
 
     return (
         <div className="d-flex page-wrapper">
