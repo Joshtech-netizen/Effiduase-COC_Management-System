@@ -1,71 +1,60 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import './Sidebar.css';
 
 const Sidebar: React.FC = () => {
-    const location = useLocation();
-    
-    // Get the user's role from local storage (defaults to 'guest' if missing)
-    const userRole = localStorage.getItem('user_role') || 'guest';
+    const navigate = useNavigate();
 
-    // Helper functions to check access
-    const isPastor = userRole === 'pastor' || userRole === 'admin';
-    const canSeeFinance = isPastor || userRole === 'finance';
-    const canSeeWelfare = isPastor || userRole === 'welfare';
-    const canSeeChildren = isPastor || userRole === 'children';
+    const handleSignOut = () => {
+        localStorage.clear();
+        navigate('/login');
+    };
 
     return (
-        <nav className="custom-sidebar shadow-lg">
-            <div className="sidebar-brand text-uppercase">
-                {userRole === 'pastor' ? 'PASTOR ADMIN' : `${userRole} ADMIN`}
+        <div className="custom-sidebar d-flex flex-column">
+            <div className="sidebar-brand">
+                <h3 className="fw-bold px-2">PASTOR ADMIN</h3>
+                <span className="sidebar-role-badge">Administrator</span>
             </div>
-            
-            <div className="sidebar-nav">
-                <Link to="/dashboard" className={`sidebar-link ${location.pathname === '/dashboard' ? 'active' : ''}`}>
-                    Dashboard
-                </Link>
-                
-                {/* Pastor gets the Members directory */}
-                {isPastor && (
-                    <Link to="/members" className={`sidebar-link ${location.pathname === '/members' ? 'active' : ''}`}>
-                        Members Directory
-                    </Link>
-                )}
-                
-                {/* Finance Head & Pastor */}
-                {canSeeFinance && (
-                    <Link to="/finance" className={`sidebar-link ${location.pathname === '/finance' ? 'active' : ''}`}>
-                        Finances
-                    </Link>
-                )}
 
-                {/* Welfare Leader & Pastor */}
-                {canSeeWelfare && (
-                    <Link to="/welfare" className={`sidebar-link ${location.pathname === '/welfare' ? 'active' : ''}`}>
-                        Welfare
-                    </Link>
-                )}
+            {/* Use 'sidebar-nav' instead of 'nav-pills' to use our custom CSS */}
+            <nav className="sidebar-nav">
+                <NavLink to="/dashboard" className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                    <span>📊</span> Dashboard
+                </NavLink>
+                <NavLink to="/members" className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                    <span>👥</span> Members Directory
+                </NavLink>
+                <NavLink to="/finance" className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                    <span>💰</span> Finance
+                </NavLink>
+                <NavLink to="/welfare" className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                    <span>🤝</span> Welfare
+                </NavLink>
+                <NavLink to="/children" className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                    <span>👶</span> Children's Ministry
+                </NavLink>
 
-                {/* Children's Leader & Pastor */}
-                {canSeeChildren && (
-                    <Link to="/children" className={`sidebar-link ${location.pathname === '/children' ? 'active' : ''}`}>
-                        Children's Ministry
-                    </Link>
-                )}
+                <hr className="my-3 text-white-50" />
 
-                {/* User Accounts (ONLY for Pastor) */}
-                {isPastor && (
-                    <Link to="/users" className={`sidebar-link ${location.pathname === '/users' ? 'active' : ''}`}>
-                        ⚙️ Manage Accounts
-                    </Link>
-                )}
+                <NavLink to="/users" className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                    <span>⚙️</span> Manage Accounts
+                </NavLink>
+                <NavLink to="/profile" className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}>
+                    <span>👤</span> My Profile
+                </NavLink>
+            </nav>
 
-                {/* My Profile (For EVERYONE) */}
-                <Link to="/profile" className={`sidebar-link ${location.pathname === '/profile' ? 'active' : ''}`}>
-                    👤 My Profile
-                </Link>
+            {/* Footer Section for Sign Out */}
+            <div className="sidebar-footer">
+                <button
+                    onClick={handleSignOut}
+                    className="btn-signout rounded-pill d-flex align-items-center justify-content-center hadow-sm"
+                >
+                    <span className="me-2">🚪</span> Sign Out
+                </button>
             </div>
-        </nav>
+        </div>
     );
 };
 
