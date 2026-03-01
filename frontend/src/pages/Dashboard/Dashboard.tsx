@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Sidebar from '../../components/Sidebar';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './Dashboard.css';
 
 interface FinanceRecord {
@@ -20,8 +20,7 @@ const Dashboard: React.FC = () => {
     const [welfareBalance, setWelfareBalance] = useState(0);
     const [totalChildren, setTotalChildren] = useState(0);
     const [loading, setLoading] = useState(true);
-    
-    const navigate = useNavigate();
+
 
     // 🔒 Security: Get the user's role from local storage
     const userRole = localStorage.getItem('user_role') || 'guest';
@@ -73,13 +72,6 @@ const Dashboard: React.FC = () => {
         fetchDashboardData();
     }, []);
 
-    // Handle Logout
-    const handleLogout = () => {
-        localStorage.removeItem('user_token');
-        localStorage.removeItem('user_role');
-        localStorage.removeItem('user_name');
-        navigate('/'); // Safely redirect back to login
-    };
 
     return (
         <div className="d-flex page-wrapper">
@@ -91,9 +83,11 @@ const Dashboard: React.FC = () => {
                         <h2 className="mb-0 fw-bold text-capitalize">{userRole === 'pastor' ? 'Pastor' : userRole} Dashboard</h2>
                         <p className="text-muted">Welcome back. Here is the real-time overview for Effiduase Church of Christ.</p>
                     </div>
-                    <button onClick={handleLogout} className="btn btn-outline-danger shadow-sm fw-bold">
-                        Sign Out
-                    </button>
+                    <div className="text-end">
+                        <span className="badge bg-light text-dark p-2 border">
+                            📅 {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                        </span>
+                    </div>
                 </header>
 
                 {loading ? (
@@ -107,7 +101,7 @@ const Dashboard: React.FC = () => {
                     <>
                         {/* 4-Card Grid for Stats - CONDITIONALLY RENDERED */}
                         <div className="row g-4 mb-5">
-                            
+
                             {/* MEMBERS VIEW (Pastor / Admin only) */}
                             {isPastor && (
                                 <div className="col-md-3">
@@ -169,19 +163,19 @@ const Dashboard: React.FC = () => {
                                                     ➕ Add Member
                                                 </Link>
                                             )}
-                                            
+
                                             {(isPastor || userRole === 'finance') && (
                                                 <Link to="/finance" className="btn btn-outline-success px-4 py-2 fw-bold">
                                                     💰 Record Offering
                                                 </Link>
                                             )}
-                                            
+
                                             {(isPastor || userRole === 'welfare') && (
                                                 <Link to="/welfare" className="btn btn-outline-info px-4 py-2 text-dark fw-bold">
                                                     🤝 Process Welfare
                                                 </Link>
                                             )}
-                                            
+
                                             {(isPastor || userRole === 'children') && (
                                                 <Link to="/children" className="btn btn-outline-warning px-4 py-2 text-dark fw-bold">
                                                     👶 Register Child
